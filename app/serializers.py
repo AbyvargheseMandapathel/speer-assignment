@@ -4,13 +4,14 @@ from django.contrib.auth import get_user_model
 from .models import CustomUser
 from django.contrib.auth import authenticate
 
+User = get_user_model()
 
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
         fields = '__all__'
         
-User = get_user_model()
+
 
 class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
