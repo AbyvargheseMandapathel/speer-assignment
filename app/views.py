@@ -3,8 +3,9 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model
 from .models import Note , CustomUser
-from .serializers import NoteSerializer , SignUpSerializer , LoginSerializer
+from .serializers import NoteSerializer, ShareNoteSerializer, SharedNoteSerializer , SignUpSerializer , LoginSerializer
 from rest_framework.authentication import TokenAuthentication
+from django.db import models
 
 
 User = get_user_model()
@@ -77,3 +78,56 @@ class NoteDetailView(generics.RetrieveUpdateDestroyAPIView):
     def delete(self, request, *args, **kwargs):
         response = super().delete(request, *args, **kwargs)
         return Response({"status": response.status_code, "info": f"Note with ID {kwargs['pk']} deleted by user: {self.request.user.username}"})
+    
+class ShareNoteView(generics.CreateAPIView):
+    serializer_class = ShareNoteSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+
+    def post(self, request, *args, **kwargs):
+        note_id = kwargs.get('pk')
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user_id = serializer.validated_data['user_id']
+
+        try:
+            note = Note.objects.get(id=note_id, user=request.user)
+        except Note.DoesNotExist:
+            return Response({"error": "Note not found or does not belong to the authenticated user."}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            shared_user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        note.shared_users.add(shared_user)
+        note.save()
+
+        return Response({"status": status.HTTP_200_OK, "info": f"Note with ID {note_id} shared with user: {shared_user.username}"})
+    
+    
+class SharedNotesView(generics.ListAPIView):
+    serializer_class = SharedNoteSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+
+    def get_queryset(self):
+        return Note.objects.filter(shared_users=self.request.user)
+    
+class NoteSearchView(generics.ListAPIView):
+    serializer_class = NoteSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+
+    def get_queryset(self):
+        query = self.request.query_params.get('q', '')
+        user = self.request.user
+
+        if not query:
+            return Note.objects.none()
+
+        return Note.objects.filter(
+            models.Q(user=user, title__icontains=query) | models.Q(user=user, content__icontains=query) |
+            models.Q(shared_users=user, title__icontains=query) | models.Q(shared_users=user, content__icontains=query)
+        )

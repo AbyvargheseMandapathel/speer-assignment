@@ -6,13 +6,8 @@ from django.contrib.auth import authenticate
 
 User = get_user_model()
 
-class NoteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Note
-        fields = '__all__'
+# Authentication
         
-
-
 class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
@@ -47,3 +42,19 @@ class LoginSerializer(serializers.Serializer):
             return {'user': user}
 
         raise serializers.ValidationError('Incorrect Credentials')
+    
+    
+# Notes
+
+class NoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Note
+        fields = '__all__'
+        
+class ShareNoteSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField()
+    
+class SharedNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Note
+        fields = ['id', 'title', 'content', 'created_at', 'updated_at']

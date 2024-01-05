@@ -76,10 +76,25 @@ WSGI_APPLICATION = 'speer_assignment.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'speer',
+        'USER':'postgres',
+        'PASSWORD':'1234',
+        'HOST':'localhost',
+        'PORT':'5433'
+    },
+    'test': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / "db.sqlite3",
     }
 }
 
@@ -132,8 +147,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '1/minute',
-        'user': '2/minute',
+        'anon': '10/minute',
+        'user': '200/minute',
     },
     'DEFAULT_THROTTLE_CLASSES': (
         'rest_framework.throttling.AnonRateThrottle',
