@@ -42,4 +42,13 @@ You can see the [API documentation](https://documenter.getpostman.com/view/21242
 python manage.py test
 ```
 
+# API Rate LIMITING
 
+For Anonymous Users API Rate Limit is 2 per minute and for Authenticated Users API Rate Limit is 5/ Minute
+
+Feel free to change them from settings.py
+
+'DEFAULT_THROTTLE_RATES': {
+        'anon': '2/minute',
+        'user': '5/minute',
+    },
