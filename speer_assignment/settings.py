@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import dj_database_url
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -52,6 +54,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
 ROOT_URLCONF = 'speer_assignment.urls'
 
 TEMPLATES = [
@@ -83,19 +86,24 @@ WSGI_APPLICATION = 'speer_assignment.wsgi.application'
 #     }
 # }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'speer',
+#         'USER':'postgres',
+#         'PASSWORD':'1234',
+#         'HOST':'localhost',
+#         'PORT':'5433'
+#     },
+#     'test': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / "db.sqlite3",
+#     }
+# }
+
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'speer',
-        'USER':'postgres',
-        'PASSWORD':'1234',
-        'HOST':'localhost',
-        'PORT':'5433'
-    },
-    'test': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / "db.sqlite3",
-    }
+    'default': dj_database_url.parse("postgres://api_jgjf_user:MnJxbVSKDl5XQCM3KMKIdiSHWi3qB8wQ@dpg-cpe2827109ks73eohe8g-a.oregon-postgres.render.com/api_jgjf")
 }
 
 
@@ -147,8 +155,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '2/minute',
-        'user': '5/minute',
+        'anon': '20/minute',
+        'user': '50/minute',
     },
     'DEFAULT_THROTTLE_CLASSES': (
         'rest_framework.throttling.AnonRateThrottle',
